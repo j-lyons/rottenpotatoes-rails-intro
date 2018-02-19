@@ -12,15 +12,25 @@ class MoviesController < ApplicationController
 
   def index
     @movies = Movie.all
-    if params.key?(:by_title)
-      @movies = Movie.order(:title)
-    elsif params.key?(:by_date)
-      @movies = Movie.order(:release_date)
-    end
     @all_ratings = Movie.ratings
     @checks = @all_ratings
+    @checks = session[:r] if session.key?(:r)
     @checks = params[:ratings].keys if params.key?(:ratings)
-    @movies = Movie.where(rating: @checks)
+    #@movies = Movie.where(rating: @checks)
+    if params.key?(:by_title)
+      @movies = Movie.where(rating: @checks).order(:title)
+      session[:by_title] = 0;
+      session.delete(:by_date)
+    elsif params.key?(:by_date)
+      @movies = Movie.where(rating: @checks).order(:release_date)
+      session[:by_date] = 0;
+      session.delete(:by_title)
+    elsif session.key?(:by_title)
+      @movies = Movie.where(rating: @checks).order(:title)
+    elsif session.key?(:by_date)
+      @movies = Movie.where(rating: @checks).order(:release_date)
+    end
+    session[:r] = @checks
   end
 
   def new
