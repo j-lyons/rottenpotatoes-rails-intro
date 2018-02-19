@@ -17,6 +17,10 @@ class MoviesController < ApplicationController
     elsif params.key?(:by_date)
       @movies = Movie.order(:release_date)
     end
+    @all_ratings = Movie.ratings
+    @checks = @all_ratings
+    @checks = params[:ratings].keys if params.key?(:ratings)
+    @movies = Movie.where(rating: @checks)
   end
 
   def new
